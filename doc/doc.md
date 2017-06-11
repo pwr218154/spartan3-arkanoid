@@ -2,9 +2,10 @@
 title: Układy Cyfrowe i Systemy Wbudowane
 subtitle: Aplikacja Arkanoid dla zestawu Xilinx Spartan3E
 author:
-- Kacper Piłkowski
-- Szymon Wojciechowski
+- Kacper Piłkowski 218169
+- Szymon Wojciechowski 218154
 lang: pl
+date: 12.06.2017
 fontsize: 11pt
 geometry: margin=1in
 indent: false
@@ -15,7 +16,23 @@ header-includes: |
 
 ## Wstęp
 
+Celem projektu było odwzorowanie gry _Arkanoid_ popularnej w latach 80-tych w implementacji sprzętowej z wykorzystaniem układu Spartan3E oraz języka VHDL. Celem autorów projetu było pogłębienie wiedzy dotyczącej układów programowalnych typu FPGA.
+
 ## Założenia projektu
+
+W trakcie realizacji projektu kierowano się następującymi założeniami:
++ Do wyświetlenia obecnego stanu gry używany jest monitor CRT
++ Transmisja obrazu wyświetlanego na monitorze zostanie zrealizowana z użyciem portu VGA
++ Gra składać się będzie z paletki, piłki, ścian planszy oraz cegieł
++ Piłka odbija się od paletki, ścian oraz cegieł
++ W wyniku odbicia piłeczki od cegła zostaje ona usunięta
++ Gracz kontroluje paletkę przy pomocy modułu _rotary encoder_
++ Paletka podzielona jest poziomo na dwie równe części
++ Po uderzeniu w prawą cześć paletki piłeczka odbija się w prawo analogicznie po uderzeniu w lewą cześć paletki
++ Gra zostaje zresetowana po tym jak piłka spadnie poniżej paletki albo zostanie wciśnięty przycisk resetu
++ Ściany znajdujące się po lewej, prawej oraz górnej części ekranu ograniczają przestrzeń rozgrywki
++ Cegły rozmieszczone są w trzech rzędach w równych odstępach w górnej części ekranu
++ Każda z cegieł jest tej samej wielkości
 
 ## Architektura systemu
 
@@ -48,7 +65,7 @@ obliczanych sygnałów jest również konstruowany obraz przekazywany do kolejne
 
 ### VGAdriver
 
-Jest to podstawowy sterownik dla monitora VGA.
+Jest to prosta realizacja sterownika VGA. Moduł obsługi wyświetlacza poza podstawowymi wyjściami odpowiedzialnymi za kolor danego piksela oraz synchronizacji kolumn oraz wierszy wyprowadza również pozycje obecnie rysowanego piksela w celu odwołania się do stanu danego piksela przechowywanego w module FrameBuffer
 
 ## Osiągnięte rezultaty
 
@@ -105,7 +122,7 @@ tworząc tylko jedno przypisanie do sygnałów zewnętrznych w osobnym procesie.
 Podczas syntezy zauważono błąd polegajacy na przepełnianiu pamięci narzędzia
 syntezy. Kod odpowiedzialny za błąd wyglądał następująco:
 
-~~~
+```
 FOR c IN 0 to 7 LOOP
 FOR r IN 0 to 4 LOOP
 IF blocks(r * 8 + c) = '1' THEN
@@ -120,7 +137,7 @@ END IF;
 END IF;
 END LOOP;
 END LOOP;
-~~~
+```
 
 Ponieważ instrukcje warunkowe są zagnieżdżone wewnątrz siebie i nie występują
 alternatywy (`else`) możliwe było sformułowanie wyrażenia jako formułę logiczną.
@@ -129,7 +146,7 @@ stosowania jedynie koniunkcji (`and`) konieczne było wprowadzenie wyrażenia
 stosując tożsamości logiczne (w szczególności `Prawo De Morgana`). Następnie ta sama
 funkcja została zapisana w następujący sposób:
 
-~~~
+```
 FOR c IN 0 TO 3 LOOP
 FOR r IN 0 TO 3 LOOP
 IF NOT (
@@ -153,9 +170,12 @@ ballKierunekY := NOT ballKierunekY;
 END IF;
 END LOOP;
 END LOOP;
-~~~
+```
 
 Po modyfikacji narzędzie syntezy znacznie przyspieszyło pracę oraz zwolnione zostały
 niepotrzebnie wcześniej zajmowane zasoby.
 
 ## Literatura
+
+1. Mark Zwoliński, Projektowanie układów cyfrowych z wykorzystaniem języka VHDL
+2. Strona internetowa http://www.zsk.ict.pwr.wroc.pl/zsk/dyd/intinz/uc/
